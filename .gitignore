@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Build
+.next/
+dist/
+build/
+coverage/
+
+# Environment
+.env
+.env.local
+.env.*
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Turborepo
+.turbo/
+
+# Misc
+.cache/
+.claude/
+.docs/
