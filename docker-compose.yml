@@ -1,0 +1,31 @@
+# Local development services for Journally.
+# Spins up PostgreSQL in an isolated container so nothing is installed on your host OS.
+# Start with:  docker compose up -d
+# Stop with:   docker compose down   (add -v to also delete the data volume)
+
+services:
+  db:
+    image: postgres:17 # official Postgres image, pinned to major version 17
+    container_name: journally-db
+    restart: unless-stopped # auto-restart if it crashes or on reboot, unless you stopped it
+    environment:
+      # These create the initial role + database on first boot.
+      # Dev-only credentials — safe to keep here because this DB never leaves your machine.
+      POSTGRES_USER: journally
+      POSTGRES_PASSWORD: journally_dev_password
+      POSTGRES_DB: journally
+    ports:
+      # host:container — your app connects to localhost:5432, forwarded into the container.
+      - "5432:5432"
+    volumes:
+      # Named volume persists your data across `docker compose down` / restarts.
+      - journally-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # Lets Docker (and us) know when Postgres is actually ready to accept connections.
+      test: ["CMD-SHELL", "pg_isready -U journally -d journally"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  journally-pgdata:
