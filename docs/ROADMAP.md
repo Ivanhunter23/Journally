@@ -9,8 +9,8 @@ honest engineering story. Scope is **v1 only** (the three pillars in [PRD.md](./
 | # | Phase | What it delivers | Est. hours | Status |
 |---|---|---|---|---|
 | 0 | Requirements & Architecture | PRD, ADRs, Git/GitHub, Next.js scaffold | ~8 | ✅ |
-| 1 | **Database** | Docker Postgres, Prisma, `schema.prisma`, first migration, seed | 6–10 | 🚧 |
-| 2 | Authentication | Auth.js + GitHub OAuth, DB sessions, route protection | 8–14 | ⬜ |
+| 1 | Database | Docker Postgres, Prisma, `schema.prisma`, first migration, seed | 6–10 | ✅ |
+| 2 | **Authentication** | Auth.js + GitHub OAuth, DB sessions, route protection | 8–14 | 🚧 |
 | 3 | Habits CRUD | Create/list/edit/archive habits — Server Actions, Zod, shadcn forms | 12–20 | ⬜ |
 | 4 | Daily logging | Log outcomes, 4-state computed status, editable history | 10–16 | ⬜ |
 | 5 | Gratification | Streak counter, calendar heatmap, badges | 10–16 | ⬜ |
