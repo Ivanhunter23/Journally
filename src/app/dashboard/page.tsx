@@ -1,7 +1,7 @@
 import {auth} from "@/auth";
 import {signOut} from "@/auth";
 import {prisma} from "@/lib/prisma";
-import { createHabit } from "../actions/habits";
+import { archiveHabit, createHabit } from "../actions/habits";
 export default async function DashboardPage() {
     const session = await auth();
     if (!session?.user?.id) return null;
@@ -16,12 +16,44 @@ export default async function DashboardPage() {
             <p>No habits yet</p>
         ):(  <ul>
                 {habits.map((habit) => (
-                    <li key = {habit.id}>{habit.name}</li>
+                    <li key = {habit.id} className="flex items-center gap-2">
+                        {habit.name}
+                        <form action={async () => {
+                            "use server";
+                            await archiveHabit(habit.id);
+
+                        }}>
+                            <button type="submit">Archive</button>
+                        </form>
+                    </li>
                 ))}
             </ul>)}
-        <form action={createHabit} className = "flex flex-col gap-2">
-            <button type="submit"> Add habit </button>
+        <form
+            action={async (formData: FormData) => {
+                "use server";
+                await createHabit(formData);
+            }}
+            className="flex flex-col gap-2"
+        >
+            <input type="text" name="name" placeholder="Habit name" />
+
+            <select name="type">
+                <option value="BINARY">Yes/No</option>
+                <option value="QUANTITATIVE">Measured</option>
+
+            </select>
+
+            <input type="number" name="targetValue" placeholder="Target" />
+            <input type="text" name="unit" placeholder="Unit (e.g. pages" />
+
+            <select name="timeOfDay" >
+                <option value="MORNING"></option>
+                <option value="EVENING"></option>
+            </select>
+
+            <button type="submit">Add habit</button>
         </form>
+
         <form
             action={async () => {
                 "use server";
