@@ -5,8 +5,11 @@ import { archiveHabit, createHabit, logHabit } from "../actions/habits";
 export default async function DashboardPage() {
     const session = await auth();
     if (!session?.user?.id) return null;
+    const now = new Date();
+    const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
     const habits = await prisma.habit.findMany({
-        where: {userId: session.user.id , archivedAt: null,}, orderBy: {createdAt:"asc"}
+        include: {logs: {where: {date: today}}}, where: {userId: session.user.id , archivedAt: null,}, orderBy: {createdAt:"asc"}
+        
     })
 
     return (
@@ -18,6 +21,7 @@ export default async function DashboardPage() {
                 {habits.map((habit) => (
                     <li key = {habit.id} className="flex items-center gap-2">
                         {habit.name}
+                        {habit.logs.length > 0 ? `(${habit.logs[0].value})` : "Not logged"}
                         <form action={async () => {
                             "use server";
                             await archiveHabit(habit.id);
@@ -69,6 +73,7 @@ export default async function DashboardPage() {
         <form
             action={async () => {
                 "use server";
+            signOut();
             }}
         >
             <button type ="submit">Sign out </button>
