@@ -11,3 +11,9 @@ export const createHabitSchema = z.object({
 
 
 })
+export const logHabitSchema = z.object({
+    habitId: z.string().min(1),
+    value: z.coerce.number().int().positive().default(1),
+
+    
+})
