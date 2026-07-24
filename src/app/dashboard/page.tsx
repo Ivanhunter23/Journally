@@ -1,7 +1,7 @@
 import {auth} from "@/auth";
 import {signOut} from "@/auth";
 import {prisma} from "@/lib/prisma";
-import { archiveHabit, createHabit } from "../actions/habits";
+import { archiveHabit, createHabit, logHabit } from "../actions/habits";
 export default async function DashboardPage() {
     const session = await auth();
     if (!session?.user?.id) return null;
@@ -24,6 +24,18 @@ export default async function DashboardPage() {
 
                         }}>
                             <button type="submit">Archive</button>
+                        </form>
+                        <form action={async (formData) =>{
+                            "use server";
+                            await logHabit(formData);
+                        }}>
+                            <input type ="hidden" name = "habitId" value={habit.id} />
+                            {habit.type === "QUANTITATIVE" ? <input type="number" name="value" /> : null}
+                            <button type="submit">Log</button>
+
+                        
+                            
+                            
                         </form>
                     </li>
                 ))}
@@ -57,10 +69,8 @@ export default async function DashboardPage() {
         <form
             action={async () => {
                 "use server";
-                await signOut();
             }}
         >
-            
             <button type ="submit">Sign out </button>
             </form>
         </main>
