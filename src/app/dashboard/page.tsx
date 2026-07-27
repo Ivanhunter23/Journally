@@ -1,7 +1,8 @@
 import {auth} from "@/auth";
 import {signOut} from "@/auth";
 import {prisma} from "@/lib/prisma";
-import { archiveHabit, createHabit, logHabit } from "../actions/habits";
+import { archiveHabit, createHabit, logHabit, } from "../actions/habits";
+import { logJournal } from "../actions/journal";
 export default async function DashboardPage() {
     const session = await auth();
     if (!session?.user?.id) return null;
@@ -70,10 +71,32 @@ export default async function DashboardPage() {
             <button type="submit">Add habit</button>
         </form>
 
+        <form action={async (formData: FormData) => {
+                "use server";
+                await logJournal(formData);
+            }
+            }className="flex flex-col gap-2">
+
+                <textarea name="wentWell" placeholder="What went well?"></textarea>
+
+
+                <textarea name="improve" placeholder="What needs improvement?"></textarea>
+
+
+                <textarea name="gratitude" placeholder="What are you grateful for today?"></textarea>
+
+
+                <textarea name="freeText" placeholder="Type something..."></textarea>
+
+
+
+                <button type="submit">Add journal entry</button>
+            </form>
+
         <form
             action={async () => {
                 "use server";
-            signOut();
+            await signOut();
             }}
         >
             <button type ="submit">Sign out </button>
