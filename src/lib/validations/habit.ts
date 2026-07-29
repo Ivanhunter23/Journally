@@ -7,7 +7,10 @@ export const createHabitSchema = z.object({
         (value) => (value === "" ? undefined : value),
         z.string().optional()
     ),
-    timeOfDay: z.enum(["MORNING", "EVENING"]).optional()
+    timeOfDay: z.preprocess(
+        (value) => (value === "" ? undefined : value),
+        z.enum(["MORNING","EVENING"]).optional()
+    )
 
 
 })
