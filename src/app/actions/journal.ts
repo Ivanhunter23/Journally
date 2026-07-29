@@ -9,17 +9,13 @@ export async function logJournal(formData: FormData){
         if(!session?.user?.id)
             return {error: "UNAUTHORIZED"}
 
-
-    
-  
-
     const parsed = journalEntrySchema.safeParse(Object.fromEntries(formData));
         if(!parsed.success) return {error: "Invalid input"}
 
 
     const now = new Date();
     const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-    
+
     const guidedAnswers = {
         wentWell: parsed.data.wentWell,
         improve: parsed.data.improve,

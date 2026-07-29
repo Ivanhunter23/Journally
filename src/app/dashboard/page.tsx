@@ -1,8 +1,10 @@
 import {auth} from "@/auth";
 import {signOut} from "@/auth";
 import {prisma} from "@/lib/prisma";
-import { archiveHabit, createHabit, logHabit, } from "../actions/habits";
-import { logJournal } from "../actions/journal";
+import { archiveHabit, logHabit, } from "../actions/habits";
+import JournalForm from "@/components/JournalForm";
+import HabitForm from "@/components/HabitForm";
+
 export default async function DashboardPage() {
     const session = await auth();
     if (!session?.user?.id) return null;
@@ -45,54 +47,9 @@ export default async function DashboardPage() {
                     </li>
                 ))}
             </ul>)}
-        <form
-            action={async (formData: FormData) => {
-                "use server";
-                await createHabit(formData);
-            }}
-            className="flex flex-col gap-2"
-        >
-            <input type="text" name="name" placeholder="Habit name" />
 
-            <select name="type">
-                <option value="BINARY">Yes/No</option>
-                <option value="QUANTITATIVE">Measured</option>
-
-            </select>
-
-            <input type="number" name="targetValue" placeholder="Target" />
-            <input type="text" name="unit" placeholder="Unit (e.g. pages" />
-
-            <select name="timeOfDay" >
-                <option value="MORNING"></option>
-                <option value="EVENING"></option>
-            </select>
-
-            <button type="submit">Add habit</button>
-        </form>
-
-        <form action={async (formData: FormData) => {
-                "use server";
-                await logJournal(formData);
-            }
-            }className="flex flex-col gap-2">
-
-                <textarea name="wentWell" placeholder="What went well?"></textarea>
-
-
-                <textarea name="improve" placeholder="What needs improvement?"></textarea>
-
-
-                <textarea name="gratitude" placeholder="What are you grateful for today?"></textarea>
-
-
-                <textarea name="freeText" placeholder="Type something..."></textarea>
-
-
-
-                <button type="submit">Add journal entry</button>
-            </form>
-
+        <HabitForm/>
+        <JournalForm/>
         <form
             action={async () => {
                 "use server";
