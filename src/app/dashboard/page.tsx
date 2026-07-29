@@ -1,9 +1,9 @@
 import {auth} from "@/auth";
 import {signOut} from "@/auth";
 import {prisma} from "@/lib/prisma";
-import { archiveHabit, logHabit, } from "../actions/habits";
 import JournalForm from "@/components/JournalForm";
 import HabitForm from "@/components/HabitForm";
+import HabitList from "@/components/HabitList";
 
 export default async function DashboardPage() {
     const session = await auth();
@@ -18,36 +18,8 @@ export default async function DashboardPage() {
     return (
         <main className ='flex min-h-screen flex-col items-center justify-center gap-4'>
         <p>Signed in as {session?.user?.name ?? session?.user?.email} </p>
-        {habits.length === 0 ? (
-            <p>No habits yet</p>
-        ):(  <ul>
-                {habits.map((habit) => (
-                    <li key = {habit.id} className="flex items-center gap-2">
-                        {habit.name}
-                        {habit.logs.length > 0 ? `(${habit.logs[0].value})` : "Not logged"}
-                        <form action={async () => {
-                            "use server";
-                            await archiveHabit(habit.id);
 
-                        }}>
-                            <button type="submit">Archive</button>
-                        </form>
-                        <form action={async (formData) =>{
-                            "use server";
-                            await logHabit(formData);
-                        }}>
-                            <input type ="hidden" name = "habitId" value={habit.id} />
-                            {habit.type === "QUANTITATIVE" ? <input type="number" name="value" /> : null}
-                            <button type="submit">Log</button>
-
-                        
-                            
-                            
-                        </form>
-                    </li>
-                ))}
-            </ul>)}
-
+        <HabitList habits={habits} />
         <HabitForm/>
         <JournalForm/>
         <form
