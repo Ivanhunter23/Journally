@@ -34,7 +34,7 @@ export default function HabitList({habits}: {habits:HabitWithLogs[]}) {
                                         await logHabit(formData);
                                     }}>
                                         <input type="hidden" name = "habitId" value={habit.id} />
-                                        {habit.type === "QUANTITATIVE" ? <Input type="number" name="value" /> : null}
+                                        {habit.type !== "BINARY" ? <Input type="number" name="value" /> : null}
                                         <Button type="submit">Log</Button>                                     
                                     </form>
                                 </li>

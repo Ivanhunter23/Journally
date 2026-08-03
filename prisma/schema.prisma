@@ -14,9 +14,20 @@ datasource db {
 
 enum HabitType {
   BINARY // done / not done
-  QUANTITATIVE // set number
+  DURATION // minutes
+  COUNT // integer quantity
 }
 
+enum HabitPolarity{
+  BUILD 
+  QUIT
+}
+enum HabitFrequency{
+  DAILY
+  WEEKLY
+  MONTHLY
+  INTERVAL
+}
 enum TimeOfDay {
   MORNING
   EVENING
@@ -48,16 +59,24 @@ model Habit {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  name        String
-  type        HabitType
-  targetValue Int
-  unit        String?
-  timeOfDay   TimeOfDay?
-  archivedAt  DateTime?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  name                String
+  type                HabitType
+  description         String?
+  polarity            HabitPolarity @default(BUILD)
+  frequency           HabitFrequency @default(DAILY)
+  intervalDays        Int?
+  startValue          Int?
+  incrementValue      Int?
+  incrementEveryDays  Int?
+  targetValue         Int
+  unit                String?
+  timeOfDay           TimeOfDay?
 
-  logs HabitLog[]
+  archivedAt          DateTime?
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  logs                HabitLog[]
 
   @@index([userId])
 }

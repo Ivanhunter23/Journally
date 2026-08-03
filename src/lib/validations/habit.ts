@@ -1,7 +1,9 @@
 import z from "zod";
+import { HabitType, TimeOfDay } from "@/generated/prisma/enums";
+
 export const createHabitSchema = z.object({
     name: z.string().min(1).max(100),
-    type: z.enum(["BINARY", "QUANTITATIVE"]),
+    type: z.enum(HabitType),
     targetValue: z.coerce.number().int().positive(),
     unit: z.preprocess(
         (value) => (value === "" ? undefined : value),
@@ -9,7 +11,7 @@ export const createHabitSchema = z.object({
     ),
     timeOfDay: z.preprocess(
         (value) => (value === "" ? undefined : value),
-        z.enum(["MORNING","EVENING"]).optional()
+        z.enum(TimeOfDay).optional()
     )
 
 

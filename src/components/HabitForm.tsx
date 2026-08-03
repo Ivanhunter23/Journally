@@ -23,7 +23,8 @@ export default function HabitForm() {
 
                     <select name="type">
                         <option value="BINARY">Yes/No</option>
-                        <option value="QUANTITATIVE">Measured</option>
+                        <option value="DURATION">Time based</option>
+                        <option value="COUNT">Number based</option>
 
                     </select>
 
