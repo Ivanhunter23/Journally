@@ -4,6 +4,9 @@ import {prisma} from "@/lib/prisma";
 import JournalForm from "@/components/JournalForm";
 import HabitForm from "@/components/HabitForm";
 import HabitList from "@/components/HabitList";
+import PlanList from "@/components/PlanList";
+import PlanForm from "@/components/PlanForm";
+
 
 export default async function DashboardPage() {
     const session = await auth();
@@ -14,6 +17,10 @@ export default async function DashboardPage() {
         include: {logs: {where: {date: today}}}, where: {userId: session.user.id , archivedAt: null,}, orderBy: {createdAt:"asc"}
         
     })
+    const planEntries = await prisma.planEntry.findMany({
+        where: {userId: session.user.id, date: today},
+        orderBy: [{position: "asc"}, {createdAt: "asc"}],
+    });
 
     return (
         <main className ='flex min-h-screen flex-col items-center justify-center gap-4'>
@@ -22,6 +29,8 @@ export default async function DashboardPage() {
         <HabitList habits={habits} />
         <HabitForm/>
         <JournalForm/>
+        <PlanList entries={planEntries}/>
+        <PlanForm/>
         <form
             action={async () => {
                 "use server";
