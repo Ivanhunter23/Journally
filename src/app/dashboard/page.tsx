@@ -19,7 +19,7 @@ export default async function DashboardPage() {
     })
     const planEntries = await prisma.planEntry.findMany({
         where: {userId: session.user.id, date: today},
-        orderBy: {position:"asc"},
+        orderBy: [{position: "asc"}, {createdAt: "asc"}],
     });
 
     return (
