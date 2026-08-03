@@ -6,13 +6,15 @@ import HabitForm from "@/components/HabitForm";
 import HabitList from "@/components/HabitList";
 import PlanList from "@/components/PlanList";
 import PlanForm from "@/components/PlanForm";
+import { getToday } from "@/lib/date";
 
 
 export default async function DashboardPage() {
     const session = await auth();
     if (!session?.user?.id) return null;
-    const now = new Date();
-    const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+
+    const today = getToday();
+
     const habits = await prisma.habit.findMany({
         include: {logs: {where: {date: today}}}, where: {userId: session.user.id , archivedAt: null,}, orderBy: {createdAt:"asc"}
         
