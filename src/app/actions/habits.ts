@@ -1,29 +1,28 @@
 "use server";
-import {auth} from "@/auth";
+import { getToday } from "@/lib/date";
 import {prisma} from "@/lib/prisma";
+import { requireUserId } from "@/lib/session";
 import { createHabitSchema,logHabitSchema } from "@/lib/validations/habit";
 import {revalidatePath} from "next/cache";
 import z from "zod";
 export async function createHabit(formData: FormData){
-    const session = await auth();
-    if(!session?.user?.id)
-        return {error: "UNAUTHORIZED"}
+    const userId = await requireUserId();
 
     const parsed = createHabitSchema.safeParse(Object.fromEntries(formData));
     if(!parsed.success) return {error: "Invalid input"}
-    await prisma.habit.create({data: {...parsed.data, userId:session.user.id}});
+
+    await prisma.habit.create({data: {...parsed.data, userId}});
     revalidatePath("/dashboard");
        
 }
 export async function archiveHabit(habitId: string){
-    const session = await auth();
-    if(!session?.user?.id)
-        return {error: "UNAUTHORIZED"}
+    const userId = await requireUserId();
+
 
     const parsed = z.string().min(1).safeParse(habitId)
     if(!parsed.success) return {error: "Invalid input"}
 
-    const result = await prisma.habit.updateMany({where: {id: habitId, userId:session.user.id}, data: {archivedAt:new Date()}})
+    const result = await prisma.habit.updateMany({where: {id: habitId, userId}, data: {archivedAt:new Date()}})
 
     if (result.count === 0 ) return {error: "Not found"};
 
@@ -32,12 +31,10 @@ export async function archiveHabit(habitId: string){
 }
 
 export async function logHabit (formData: FormData){
-    const session = await auth();
-    if(!session?.user?.id)
-        return {error: "UNAUTHORIZED"}
+    const userId = await requireUserId();
 
-    const now = new Date();
-    const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    const today = getToday();
+
 
 
     const parsed = logHabitSchema.safeParse(Object.fromEntries(formData));
@@ -45,7 +42,7 @@ export async function logHabit (formData: FormData){
     
     
     
-    const habit = await prisma.habit.findFirst({where: {id: parsed.data.habitId, userId:session.user.id}})
+    const habit = await prisma.habit.findFirst({where: {id: parsed.data.habitId, userId}})
     if (!habit) return {error: "Not found"};
 
     await prisma.habitLog.upsert({

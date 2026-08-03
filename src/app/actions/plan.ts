@@ -1,27 +1,24 @@
 "use server";
 
-import { auth } from "@/auth";
+import { getToday } from "@/lib/date";
 import { prisma } from "@/lib/prisma";
+import { requireUserId } from "@/lib/session";
 import { createPlanEntrySchema } from "@/lib/validations/plan";
 import { revalidatePath } from "next/cache";
 import z from "zod";
 
 export async function createPlanEntry(formData: FormData){
-    const session = await auth();
-        if(!session?.user?.id)
-            return {error: "UNAUTHORIZED"}
+    const userId = await requireUserId();
 
     const parsed = createPlanEntrySchema.safeParse(Object.fromEntries(formData));
         if(!parsed.success) return {error: "Invalid input"}
 
-
-    const now = new Date();
-    const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    const today = getToday();
 
     
     
     const last  = await prisma.planEntry.findFirst({
-        where:{ userId: session.user.id, date:today},
+        where:{userId, date:today},
         orderBy: {position: "desc"},
         select: {position: true},
 
@@ -31,27 +28,23 @@ export async function createPlanEntry(formData: FormData){
 
 
         await prisma.planEntry.create({
-                data:   {userId: session.user.id, 
+                data:   {userId, 
                         date: today, 
                         text: parsed.data.text, 
-                        position: position },
+                        position },
             });
     revalidatePath("/dashboard");
 }
 
 export async function deletePlanEntry(id: string) {
 
-     const session = await auth();
-        if(!session?.user?.id)
-            return {error: "UNAUTHORIZED"}
-
-    
+    const userId = await requireUserId();
 
     const parsed = z.string().min(1).safeParse(id);
     if(!parsed.success) return {error: "Invalid input"}
-
+    
     const result = await prisma.planEntry.deleteMany({
-        where: {id, userId:session.user.id},
+        where: {id,userId},
     });
     if (result.count === 0 ) return {error: "Not found"}
 
@@ -61,16 +54,13 @@ export async function deletePlanEntry(id: string) {
 
 export async function togglePlanEntry(id: string, done: boolean){
 
-       const session = await auth();
-        if(!session?.user?.id)
-            return {error: "UNAUTHORIZED"}
+    const userId = await requireUserId();
 
-    
     const parsed = z.string().min(1).safeParse(id);
     if(!parsed.success) return {error: "Invalid input"}
 
     const result = await prisma.planEntry.updateMany({
-        where: {id, userId:session.user.id},
+        where: {id,userId},
         data: {done}
     });
     if (result.count === 0 ) return {error: "Not found"}
